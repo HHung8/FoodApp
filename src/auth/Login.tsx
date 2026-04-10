@@ -3,25 +3,32 @@ import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Separator } from "../components/ui/separator";
 import { Link } from "react-router-dom";
-import { useState, type ChangeEvent } from "react";
+import { useState, type ChangeEvent, type FormEvent} from "react";
+import { userLoginSchema, type LoginInputState } from "../schema/userSchema";
 
-interface LoginInputState {
-  email: string;
-  password: string;
-}
+// interface LoginInputState {
+//   email: string;
+//   password: string;
+// }
 
 const Login = () => {
   const [input, setInput] = useState<LoginInputState>({
     email: "",
     password: "",
   });
-  const changeEventHandler = (e: ChangeEvent<HTMLInputElement>) => {
+  const [errors, setErrors] = useState<Partial<LoginInputState>>({});
+  const changeEventHandler = (e:ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setInput({ ...input, [name]: value });
   };
-
-  const loginSubmitHandler = (e: FormEvent) => {
+  const loginSubmitHandler = (e:FormEvent) => {
     e.preventDefault();
+    const result = userLoginSchema.safeParse(input);
+    if(!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors;
+      setErrors(fieldErrors as Partial<LoginInputState>);
+      return;
+    }
     console.log(input);
   };
 
@@ -46,6 +53,7 @@ const Login = () => {
               onChange={changeEventHandler}
             />
             <Mail className="absolute inset-y-2 left-2 text-gray-500 pointer-events-none" />
+            {errors.email && <span className="text-sm text-red-500">{errors.email}</span>}
           </div>
         </div>
         <div className="mb-4">
@@ -59,6 +67,7 @@ const Login = () => {
               onChange={changeEventHandler}
             />
             <LockKeyhole className="absolute inset-y-2 left-2 text-gray-500 pointer-events-none" />
+            {errors.password && <span className="text-sm text-red-500">{errors.password}</span>}
           </div>
         </div>
         <div className="mb-10">
@@ -78,6 +87,9 @@ const Login = () => {
               Login
             </Button>
           )}
+          <div className="mt-4">
+            <Link to="/forgot-password" className="text-blue-500">Forgot Password</Link>
+          </div>
         </div>
         <Separator />
         <p className="mt-2">
