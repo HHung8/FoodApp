@@ -4,15 +4,8 @@ import { Loader2, LockKeyhole, Mail, PhoneOutgoing, Space, User } from "lucide-r
 import { Button } from "../components/ui/button";
 import { Separator } from "../components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
-import { useUserStore } from "../store/useCartStore";
+import { useUserStore } from "../store/useUserStore";
 import { userSignupSchema, type SignupInputState } from "../schema/userSchema";
-
-// interface SignupInputState {
-//     fullname: string,
-//     email: string,
-//     password: string,
-//     contact: string
-// }
 
 const Signup = () => {
     const [input, setInput] = useState<SignupInputState>({
@@ -21,34 +14,38 @@ const Signup = () => {
         password:"",
         contact:""
     });
+
     const [errors, setErrors] = useState<Partial<SignupInputState>>({});
+    const {signup} = useUserStore();
+    const navigate = useNavigate();
+    const loading = false;
+
     const changeEventHandler = (e:ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target; 
         setInput({...input, [name]:value});
     }
 
-    const {signup, loading} = useUserStore();
-    const navigate = useNavigate();
-
-
     const signupSubmitHandler = async(e:FormEvent) => {
         e.preventDefault();
         const result = userSignupSchema.safeParse(input);
+        console.log(`check result`, result);
         if(!result.success) {
             const fieldErrors = result.error.flatten().fieldErrors;
             setErrors(fieldErrors as Partial<SignupInputState>);
             return;
         };
         // login api implementation start here
-        console.log(input);
+        try {
+            await signup(input);
+            navigate("/verify-email");
+        } catch (error) {   
+            console.log(error);
+        }
     }
     
     return (
     <div className="flex items-center justify-center min-h-screen">
-        <form 
-          onSubmit={signupSubmitHandler}
-          className="md:p-8 w-full max-w-md rounded-lg md:border border-gray-200 mx-4"
-        >
+        <form onSubmit={signupSubmitHandler} className="md:p-8 w-full max-w-md rounded-lg md:border border-gray-200 mx-4">
             <div className="mb-4">
                 <h1 className="font-bold text-2xl">Yushing Dev Eats</h1>
             </div>

@@ -8,7 +8,7 @@ const VerifyEmail = () => {
    const [otp, setOtp] = useState<string[]>(["","","","","",""]);
    const inputRef = useRef<any>([]);
    const navigate = useNavigate();
-   const loading = true;
+   const loading = false;
    
    const handleChange = (index:number, value:string) => {
       if(/^[a-zA-Z0-9]$/.test(value) || value === "") {
