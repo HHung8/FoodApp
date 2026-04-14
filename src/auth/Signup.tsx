@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent, type FormEvent } from "react"
 import { Input } from "../components/ui/input";
-import { Loader2, LockKeyhole, Mail, PhoneOutgoing, Space, User } from "lucide-react";
+import { Loader2, LockKeyhole, Mail, PhoneOutgoing, User } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Separator } from "../components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";

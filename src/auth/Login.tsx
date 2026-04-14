@@ -2,9 +2,10 @@ import { Loader2, LockKeyhole, Mail } from "lucide-react";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Separator } from "../components/ui/separator";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, type ChangeEvent, type FormEvent} from "react";
 import { userLoginSchema, type LoginInputState } from "../schema/userSchema";
+import { useUserStore } from "../store/useUserStore";
 
 // interface LoginInputState {
 //   email: string;
@@ -17,20 +18,29 @@ const Login = () => {
     password: "",
   });
   const [errors, setErrors] = useState<Partial<LoginInputState>>({});
+  const {login} = useUserStore();
+  const navigate = useNavigate();
+
   const changeEventHandler = (e:ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setInput({ ...input, [name]: value });
   };
-  const loginSubmitHandler = (e:FormEvent) => {
+
+  const loginSubmitHandler = async(e:FormEvent) => {
     e.preventDefault();
     const result = userLoginSchema.safeParse(input);
     if(!result.success) {
-      const fieldErrors = result.error.flatten().fieldErrors;
-      setErrors(fieldErrors as Partial<LoginInputState>);
-      return;
+        const fieldErrors = result.error.flatten().fieldErrors;
+        setErrors(fieldErrors as Partial<LoginInputState>);
+        return;
     }
-    console.log(input);
-  };
+    try {
+       await login(input);
+       navigate("/")
+    } catch (error) {
+        console.log(error);
+    }
+};
 
   const loading = false;
   return (

@@ -1,11 +1,13 @@
 import { Input } from "../components/ui/input";
-import { useRef, useState } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Loader2 } from "lucide-react";
+import { useUserStore } from "../store/useUserStore";
 
 const VerifyEmail = () => {
    const [otp, setOtp] = useState<string[]>(["","","","","",""]);
+   const {verifyEmail} = useUserStore();
    const inputRef = useRef<any>([]);
    const navigate = useNavigate();
    const loading = false;
@@ -27,6 +29,16 @@ const VerifyEmail = () => {
       }
    }
 
+   const submitHandler = async(e:FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const verificationCode = otp.join("");
+        try {
+          await verifyEmail(verificationCode);
+          navigate("/");
+        } catch (error) {
+          console.log(error);
+        }        
+   }  
    
    return (
     <div className="flex items-center justify-center h-screen w-full">
@@ -37,7 +49,7 @@ const VerifyEmail = () => {
             Enter the 6 digit code sent to your email address
           </p>
         </div>
-        <form action="">
+        <form onSubmit={submitHandler}>
             <div className="flex justify-between">
                {
                 otp.map((letter:string, idx:number) => (
@@ -58,8 +70,6 @@ const VerifyEmail = () => {
               loading 
                 ? <Button className="bg-orange hover:bg-hoverOrange mt-6 w-full" ><Loader2 className="mr-2 w-4 h-4 animate-spin" /> Please wait</Button> 
                 : <Button className="bg-orange hover:bg-hoverOrange mt-6 w-full">Verify</Button>
-
-                
             }
         </form>
       </div>
