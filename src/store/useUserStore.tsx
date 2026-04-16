@@ -71,10 +71,9 @@ export const useUserStore = create<UserState>()(
           const response = await axios.post(`${API_END_POINT}/login`, input, {
             headers: { "Content-Type": "application/json" },
           });
-          console.log(`check response user`, response.data.data.user);
-          console.log(`check response`, response.data.success);
           if (response.data.success) {
             toast.success(response.data.message);
+            localStorage.setItem("token", response.data.data.token);
             set({
               loading: false,
               user: response.data.data.user,
