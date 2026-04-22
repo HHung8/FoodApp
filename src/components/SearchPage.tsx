@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import FilterPage from "./FilterPage";
 import { Input } from "./ui/input";
@@ -8,13 +8,19 @@ import { Globe, MapPin, X } from "lucide-react";
 import { Card, CardContent, CardFooter } from "./ui/card";
 import { AspectRatio } from "./ui/aspect-ratio";
 import { Skeleton } from "./ui/skeleton";
+import { useRestaurantStore } from "../store/useRestaurantStore";
 
 const SearchPage = () => {
+  const API_END_POINT = "http://localhost:5246"
   const params = useParams();
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const loading = false;
-  const searchedRestaurant = { data: [] };
-  
+  const {searchedRestaurant, searchRestaurant, loading, appliedFilter} = useRestaurantStore();
+  console.log(`check search123`, searchRestaurant);
+  useEffect(() => {
+    searchRestaurant(params.text!, searchQuery, appliedFilter);
+    console.log(`checksearchRestaurant`, searchRestaurant)
+  }, [params.text!,appliedFilter]);
+
   return (
     <div className="max-w-7xl mx-auto my-10">
       <div className="flex flex-col md:flex-row justify-between gap-10">
@@ -54,18 +60,18 @@ const SearchPage = () => {
             <div className="grid md:grid-cols-3 gap-4">
               {loading ? (
                 <SearchPageSkeleton />
-              ) : !loading && searchedRestaurant?.data.length === 0 ? (
+              ) : !loading && searchedRestaurant?.length === 0 ? (
                 <NoResultFound searchText={params.text!} />
               ) : (
-                searchedRestaurant?.data.map((restaurant: Restaurant) => (
+                searchedRestaurant?.map((restaurant: Restaurant) => (
                   <Card
-                    key={restaurant._id}
+                    key={restaurant.id}
                     className="bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300"
                   >
                     <div className="relative">
                       <AspectRatio ratio={16 / 6}>
                         <img
-                          src={restaurant.imageUrl}
+                          src={`${API_END_POINT}${restaurant.imageURL}`}
                           alt=""
                           className="w-full h-full object-cover"
                         />
@@ -110,7 +116,7 @@ const SearchPage = () => {
                       </div>
                     </CardContent>
                     <CardFooter className="p-4 border-t dark:border-t-gray-700 border-t-gray-100 text-white flex justify-end">
-                      <Link to={`/restaurant/${restaurant._id}`}>
+                      <Link to={`/restaurant/${restaurant.id}`}>
                         <Button className="bg-orange hover:bg-hoverOrange font-semibold py-2 px-4 rounded-full shadow-md transition-colors duration-200">
                           View Menus
                         </Button>

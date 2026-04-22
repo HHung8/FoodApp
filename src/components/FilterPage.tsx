@@ -2,6 +2,7 @@ import React from 'react'
 import { Button } from './ui/button';
 import { Label } from '@radix-ui/react-menubar';
 import { Checkbox } from './ui/checkbox';
+import { useRestaurantStore } from '../store/useRestaurantStore';
 
 
 export type FilterOptionsState = {
@@ -17,8 +18,9 @@ const filterOptions: FilterOptionsState[] = [
 ];
 
 const FilterPage = () => {
+  const {setAppliedFilter} = useRestaurantStore();
   const appliedFilterHandler = (value: string) => {
-    alert(value);
+    setAppliedFilter(value);
   }
   return (
     <div className="md:w-72">

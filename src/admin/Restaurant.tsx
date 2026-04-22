@@ -3,7 +3,6 @@ import { Label } from '../components/ui/label';
 import { Input } from '../components/ui/input';
 import { restaurantFromSchema, type RestaurantFormSchema } from '../schema/restaurantSchema';
 import { useRestaurantStore } from '../store/useRestaurantStore';
-import { file } from 'zod';
 import { Button } from '../components/ui/button';
 import { Loader2 } from 'lucide-react';
 

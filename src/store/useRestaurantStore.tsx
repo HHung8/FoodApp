@@ -6,10 +6,48 @@ import axiosInstance from "../lib/axiosInstance";
 
 const API_END_POINT = "http://localhost:5246/api/restaurant";
 
-export const useRestaurantStore = create()(persist((set) => ({
+type MenuItem = {
+    id:string;
+    name:string;
+    description:string;
+    price:number;
+    image:string;
+}
+
+type Restaurant = {
+    id:string;
+    user:string;
+    restaurantName:string;
+    city:string;
+    country:string;
+    deliveryTime:number;
+    cuisines: string[];
+    menus: MenuItem[];
+    imageUrl: string;
+}
+
+type RestaurantState = {
+    loading:boolean;
+    restaurant: Restaurant | null;
+    searchedRestaurant: Restaurant[] | null;
+    appliedFilter:string[];
+    createRestaurant: (formData:FormData) => Promise<void>;
+    getRestaurant: () => Promise<void>;
+    updateRestaurant: (formData:FormData) => Promise<void>;
+    searchRestaurant: (searchText:string, searchQuery:string, selectedCuisines:any) => Promise<void>;
+    addMenuToRestaurant: (menu:any) => void;
+    updateMenuToRestaurant: (menu:any) => void;    
+    setAppliedFilter: (value:string) => void;
+    
+} 
+
+export const useRestaurantStore = create<RestaurantState>()(persist((set) => ({
     loading: false,
     restaurant: null,
     searchedRestaurant: null,
+    appliedFilter: [],
+    singleRestaurant: null,
+    restaurantOrder: [],
     createRestaurant: async(formData:FormData ) => {
         try {
             set({loading:true});
@@ -44,11 +82,10 @@ export const useRestaurantStore = create()(persist((set) => ({
             throw error;
         }
     },
-    
-    updateRestaurant: async(formData: FormData) => {
+    updateRestaurant: async(fomData: FormData) => {
         try {
             set({loading: true});
-            const response = await axiosInstance.put(`${API_END_POINT}`, formData, {
+            const response = await axiosInstance.put(`${API_END_POINT}`, fomData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -65,24 +102,54 @@ export const useRestaurantStore = create()(persist((set) => ({
             throw error;
         }
     },
-
-    searchRestaurant: async (searchText:string, searchQuery:string, selectedCuisines:string) => {
+    searchRestaurant: async (searchText:string, searchQuery:string, selectedCuisines:any) => {
         try {
             set({loading: true});
             const params = new URLSearchParams();
             params.set("searchQuery", searchQuery);
-            params.set("selectedCuisines", selectedCuisines);
-            const response = await axios.get(`${API_END_POINT}/search/${searchText}?searchQuery=${searchQuery}?${params.toString()}`);
-            if(response.data.success) {
-                console.log(response.data);
-                set({loading:false, searchedRestaurant: response.data});   
-            }
+            params.set("selectedCuisines", selectedCuisines.join(", "));
+            const response = await axiosInstance.get(`${API_END_POINT}/search/${searchText}?${params.toString()}`);
+            set({loading:false, searchedRestaurant: response.data});   
+            // if(response.data.success) {
+            //     console.log(response.data);
+            //     set({loading:false, searchedRestaurant: response.data});   
+            // }
         } catch (error) {
             toast.error(axios.isAxiosError(error) ? error.response?.data?.message : "An error occurred");
             set({loading:false});
             throw error;
         }
+    },
+    addMenuToRestaurant: (menu:any) => {
+        set((state:any) => ({
+            restaurant: state.restaurant ? {...state.restaurant, menus:[...state.restaurant.menus, menu]} : null,
+        })) 
+    },
+    updateMenuToRestaurant: (updatedMenu: any) => {
+        set((state: any) => {
+            if (state.restaurant) {
+                const updatedMenuList = state.restaurant.menus.map((menu: any) =>
+                    menu.id === updatedMenu.id ? updatedMenu : menu 
+                );
+                return {
+                    restaurant: {
+                        ...state.restaurant,
+                        menus: updatedMenuList
+                    }
+                };
+            }
+            return state;
+        });
+    },
+    // appliedFilter -> ["momos", "biryani"]
+    setAppliedFilter: (value:string) => {
+        set((state) => {
+            const isAlreadyApplied = state.appliedFilter.includes(value);
+            const updatedFilter = isAlreadyApplied ? state.appliedFilter.filter((item) => item != value) : [...state.appliedFilter, value];
+            return {appliedFilter:updatedFilter}
+        })
     }
+
 
 }), {
     name: "restaurant-name",

@@ -1,10 +1,11 @@
-
 import {Dispatch,FormEvent,SetStateAction,useEffect,useState} from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../components/ui/dialog";
 import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Loader2 } from "lucide-react";
+import { menuSchema, type MenuFormSchema } from "../schema/menuSchema";
+import { useMenuStore } from "../store/useMenuStore";
 
 const EditMenu = ({
   selectedMenu,
@@ -21,9 +22,8 @@ const EditMenu = ({
     price: 0,
     image: undefined,
   });
-  const loading = false;
   const [error, setError] = useState<Partial<MenuFormSchema>>({});
-//   const {loading, editMenu} = useMenuStore();
+  const {loading, editMenu} = useMenuStore();
 
   const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -32,36 +32,37 @@ const EditMenu = ({
 
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // const result = menuSchema.safeParse(input);
-    // if (!result.success) {
-    //   const fieldErrors = result.error.formErrors.fieldErrors;
-    //   setError(fieldErrors as Partial<MenuFormSchema>);
-    //   return;
-    // }
-     
-    // // api ka kaam start from here
-    // try {
-    //   const formData = new FormData();
-    //   formData.append("name", input.name);
-    //   formData.append("description", input.description);
-    //   formData.append("price", input.price.toString());
-    //   if(input.image){
-    //     formData.append("image", input.image);
-    //   }
-    //   await editMenu(selectedMenu._id, formData);
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    const result = menuSchema.safeParse(input);
+    if (!result.success) {
+      const fieldErrors = result.error.formErrors.fieldErrors;
+      setError(fieldErrors as Partial<MenuFormSchema>);
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("name", input.name);
+      formData.append("description", input.description);
+      formData.append("price", input.price.toString());
+      if(input.image) {
+        formData.append("image", input.image);
+      }
+      await editMenu(selectedMenu.id, formData);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => { 
-    // setInput({
-    //   name: selectedMenu?.name || "",
-    //   description: selectedMenu?.description || "",
-    //   price: selectedMenu?.price || 0,
-    //   image: undefined,
-    // });
+    console.log(`check selectedMenu123`, selectedMenu);
+    setInput({
+      name: selectedMenu?.name || "",
+      description: selectedMenu?.description || "",
+      price: selectedMenu?.price || 0,
+      image: undefined,
+    });
   }, [selectedMenu]);
+
   return (
     <Dialog open={editOpen} onOpenChange={setEditOpen}>
       <DialogContent>

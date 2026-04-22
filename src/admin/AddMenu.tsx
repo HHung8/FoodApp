@@ -1,12 +1,13 @@
-
-import { Loader2, Plus } from "lucide-react";
-import React, { FormEvent, useState } from "react";
+import { useState } from "react";
+import { useMenuStore } from "../store/useMenuStore";
+import { useRestaurantStore } from "../store/useRestaurantStore";
+import { menuSchema, type MenuFormSchema } from "../schema/menuSchema";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog";
 import { Button } from "../components/ui/button";
+import { Loader2, Plus } from "lucide-react";
 import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
 import EditMenu from "./EditMenu";
-
 
 const AddMenu = () => {
   const [input, setInput] = useState<MenuFormSchema>({
@@ -17,12 +18,13 @@ const AddMenu = () => {
   });
   const [open, setOpen] = useState<boolean>(false);
   const [editOpen, setEditOpen] = useState<boolean>(false);
-  const loading = false;
   const [selectedMenu, setSelectedMenu] = useState<any>();
-//   const [error, setError] = useState<Partial<MenuFormSchema>>({});
-//   const { loading, createMenu } = useMenuStore();
-//   const {restaurant} = useRestaurantStore();
+  const [error, setError] = useState<Partial<MenuFormSchema>>({});
+  const { loading, createMenu } = useMenuStore();
+  const {restaurant} = useRestaurantStore();
+  console.log(`checl restaurant 123`, restaurant);
 
+  const BASE_URL = "http://localhost:5246"
   const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
     setInput({ ...input, [name]: type === "number" ? Number(value) : value });
@@ -30,25 +32,25 @@ const AddMenu = () => {
 
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // const result = menuSchema.safeParse(input);
-    // if (!result.success) {
-    //   const fieldErrors = result.error.formErrors.fieldErrors;
-    //   setError(fieldErrors as Partial<MenuFormSchema>);
-    //   return;
-    // }
-    // // api ka kaam start from here
-    // try {
-    //   const formData = new FormData();
-    //   formData.append("name", input.name);
-    //   formData.append("description", input.description);
-    //   formData.append("price", input.price.toString());
-    //   if(input.image){
-    //     formData.append("image", input.image);
-    //   }
-    //   await createMenu(formData);
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    const result = menuSchema.safeParse(input);
+    if (!result.success) {
+      const fieldErrors = result.error.formErrors.fieldErrors;
+      setError(fieldErrors as Partial<MenuFormSchema>);
+      return;
+    }
+    // api ka kaam start from here
+    try {
+      const formData = new FormData();
+      formData.append("name", input.name);
+      formData.append("description", input.description);
+      formData.append("price", input.price.toString());
+      if(input.image){
+        formData.append("image", input.image);
+      }
+      await createMenu(formData);
+    } catch (error) {
+      console.log(error);
+    }
    
   };
   return (
@@ -81,11 +83,11 @@ const AddMenu = () => {
                   onChange={changeEventHandler}
                   placeholder="Enter menu name"
                 />
-                {/* {error && (
+                {error && (
                   <span className="text-xs font-medium text-red-600">
                     {error.name}
                   </span>
-                )} */}
+                )}
               </div>
               <div>
                 <Label>Description</Label>
@@ -96,26 +98,26 @@ const AddMenu = () => {
                   onChange={changeEventHandler}
                   placeholder="Enter menu description"
                 />
-                {/* {error && (
+                {error && (
                   <span className="text-xs font-medium text-red-600">
                     {error.description}
                   </span>
-                )} */}
+                )}
               </div>
               <div>
                 <Label>Price in (Rupees)</Label>
-                <Input      
+                <Input
                   type="number"
                   name="price"
                   value={input.price}
                   onChange={changeEventHandler}
                   placeholder="Enter menu price"
                 />
-                {/* {error && (
+                {error && (
                   <span className="text-xs font-medium text-red-600">
                     {error.price}
                   </span>
-                )} */}
+                )}
               </div>
               <div>
                 <Label>Upload Menu Image</Label>
@@ -129,11 +131,11 @@ const AddMenu = () => {
                     })
                   }
                 />
-                {/* {error && (
+                {error && (
                   <span className="text-xs font-medium text-red-600">
                     {error.image?.name}
                   </span>
-                )} */}
+                )}
               </div>
               <DialogFooter className="mt-5">
                 {loading ? (
@@ -151,11 +153,11 @@ const AddMenu = () => {
           </DialogContent>
         </Dialog>
       </div>
-      {/* {restaurant?.menus.map((menu: any, idx: number) => (
+      {restaurant?.menus.map((menu: any, idx: number) => (
         <div key={idx} className="mt-6 space-y-4">
           <div className="flex flex-col md:flex-row md:items-center md:space-x-4 md:p-4 p-2 shadow-md rounded-lg border">
             <img
-              src={menu.image}
+              src={`${BASE_URL}${menu.image}`}
               alt=""
               className="md:h-24 md:w-24 h-16 w-full object-cover rounded-lg"
             />
@@ -165,7 +167,7 @@ const AddMenu = () => {
               </h1>
               <p className="text-sm tex-gray-600 mt-1">{menu.description}</p>
               <h2 className="text-md font-semibold mt-2">
-                Price: <span className="text-[#D19254]">80</span>
+                Price: <span className="text-[#D19254]">{menu.price}</span>
               </h2>
             </div>
             <Button
@@ -180,7 +182,7 @@ const AddMenu = () => {
             </Button>
           </div>
         </div>
-      ))} */}
+      ))}
       <EditMenu
         selectedMenu={selectedMenu}
         editOpen={editOpen}
