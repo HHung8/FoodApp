@@ -9,17 +9,21 @@ import { Card, CardContent, CardFooter } from "./ui/card";
 import { AspectRatio } from "./ui/aspect-ratio";
 import { Skeleton } from "./ui/skeleton";
 import { useRestaurantStore } from "../store/useRestaurantStore";
+import type { Restaurant } from "../types/restaurantType";
 
 const SearchPage = () => {
   const API_END_POINT = "http://localhost:5246"
+  
   const params = useParams();
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const {searchedRestaurant, searchRestaurant, loading, appliedFilter} = useRestaurantStore();
-  console.log(`check search123`, searchRestaurant);
+  const {searchedRestaurant, searchRestaurant, loading, setAppliedFilter, appliedFilter} = useRestaurantStore();
+  console.log(`check appliedFilter`, appliedFilter);
   useEffect(() => {
     searchRestaurant(params.text!, searchQuery, appliedFilter);
     console.log(`checksearchRestaurant`, searchRestaurant)
   }, [params.text!,appliedFilter]);
+
+
 
   return (
     <div className="max-w-7xl mx-auto my-10">
@@ -33,14 +37,14 @@ const SearchPage = () => {
               placeholder="Search by restaurant & cuisines"
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <Button>Search</Button>
+            <Button onClick={() =>  searchRestaurant(params.text!, searchQuery, appliedFilter)} className="bg-orange hover:bg-hoverOrange" >Search</Button>
           </div>
           <div>
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-2 my-3">
-                <h1 className="font-medium text-lg">Search result found</h1>
+                <h1 className="font-medium text-lg"> ({searchedRestaurant?.length}) Search result found</h1>
                 <div>
                     {
-                        ["biryani","momos","jalebi"].map((selectedFilter:string, idx:number) => (
+                        appliedFilter.map((selectedFilter:string, idx:number) => (
                             <div key={idx} className="relative inline-flex items-center max-w-full">
                                 <Badge 
                                     className="text-[#D19254] rounded-md hover:cursor-pointer pr-6 whitespace-nowrap"
@@ -49,6 +53,7 @@ const SearchPage = () => {
                                     {selectedFilter}
                                 </Badge>
                                 <X 
+                                    onClick={() => setAppliedFilter(selectedFilter)}
                                     size={16}
                                     className="absolute text-[#D19254] right-1 hover:cursor-pointer"
                                 />

@@ -4,19 +4,20 @@ import React, { useRef, useState } from "react";
 import { Input } from "./ui/input";
 import { Label } from "@radix-ui/react-menubar";
 import { Button } from "./ui/button";
+import { useUserStore } from "../store/useUserStore";
 
 const Profile = () => {
+  const {user, updateProfile} = useUserStore();
   const [profileData, setProfileData] = useState({
-    fullname: "",
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
-    country: "",
-    profilePicture: "",
+    fullname: user?.fullname || "",
+    email: user?.email || "",
+    address: user?.address || "",
+    city: user?.city || "",
+    country: user?.country || "",
+    profilePicture: user?.profilePicture || "",
   });
   const imageRef = useRef<HTMLInputElement | null>(null);
-  const [selectedProfilePicture, setSelectedProfilePicture] = useState<string>("");
+  const [selectedProfilePicture, setSelectedProfilePicture] = useState<string>( profileData?.profilePicture || "");
   const loading = false;
 
   const fileChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,9 +41,10 @@ const Profile = () => {
     setProfileData({ ...profileData, [name]: value });
   };
 
-  const updateProfileHandler = (e: FormEvent<HTMLFormElement>) => {
+  const updateProfileHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(profileData);
+    // console.log(profileData);
+    await updateProfile(profileData);
   };
 
   return (
@@ -82,6 +84,7 @@ const Profile = () => {
             <Label>Email</Label>
             <input
               name="email"
+              disabled
               value={profileData.email}
               onChange={changeHandler}
               className="w-full text-gray-600 bg-transparent focus-visible:ring-0 focus-visible:border-transparent outline-none border-none"

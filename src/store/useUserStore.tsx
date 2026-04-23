@@ -4,6 +4,7 @@ import axios from "axios";
 import type { LoginInputState, SignupInputState } from "../schema/userSchema";
 import { toast } from "sonner";
 import axiosInstance from "../lib/axiosInstance";
+import { file } from "zod";
 
 const API_END_POINT = "http://localhost:5246/api/user";
 axios.defaults.withCredentials = true;
@@ -162,23 +163,27 @@ export const useUserStore = create<UserState>()(
           set({ loading: false });
         }
       },
-
       updateProfile: async (input: any) => {
-        try {
-          const response = await axios.put(`${API_END_POINT}/profile/update`,input,{
-              headers: {
-                "Content-Type": "application/json",
-              },
-            },
-          );
-          if (response.data.success) {
-            toast.success(response.data.message);
-            set({ user: response.data.user, isAuthenticated: true });
-          }
-        } catch (error:any) {
-          toast.error(error.response.data.message);
-        }
-      },
+            try {
+                const response = await axiosInstance.put(
+                    `${API_END_POINT}/profile/update`,
+                    input, // FormData
+                    { headers: { "Content-Type": "multipart/form-data" } } // ✅ đổi sang multipart
+                );
+                if (response.data.success) {
+                    toast.success(response.data.message);
+                    set((state) => ({
+                        user: {
+                            ...state.user,         // ✅ giữ lại isVerified, admin,...
+                            ...response.data.data  // ✅ ghi đè data mới
+                        },
+                        isAuthenticated: true
+                    }));
+                }
+            } catch (error: any) {
+                toast.error(error.response.data.message);
+            }
+        },
     }),
     {
       name: "user-name",

@@ -3,43 +3,9 @@ import { toast } from "sonner";
 import {create} from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import axiosInstance from "../lib/axiosInstance";
+import type { RestaurantState } from "../types/restaurantType";
 
 const API_END_POINT = "http://localhost:5246/api/restaurant";
-
-type MenuItem = {
-    id:string;
-    name:string;
-    description:string;
-    price:number;
-    image:string;
-}
-
-type Restaurant = {
-    id:string;
-    user:string;
-    restaurantName:string;
-    city:string;
-    country:string;
-    deliveryTime:number;
-    cuisines: string[];
-    menus: MenuItem[];
-    imageUrl: string;
-}
-
-type RestaurantState = {
-    loading:boolean;
-    restaurant: Restaurant | null;
-    searchedRestaurant: Restaurant[] | null;
-    appliedFilter:string[];
-    createRestaurant: (formData:FormData) => Promise<void>;
-    getRestaurant: () => Promise<void>;
-    updateRestaurant: (formData:FormData) => Promise<void>;
-    searchRestaurant: (searchText:string, searchQuery:string, selectedCuisines:any) => Promise<void>;
-    addMenuToRestaurant: (menu:any) => void;
-    updateMenuToRestaurant: (menu:any) => void;    
-    setAppliedFilter: (value:string) => void;
-    
-} 
 
 export const useRestaurantStore = create<RestaurantState>()(persist((set) => ({
     loading: false,
@@ -108,6 +74,7 @@ export const useRestaurantStore = create<RestaurantState>()(persist((set) => ({
             const params = new URLSearchParams();
             params.set("searchQuery", searchQuery);
             params.set("selectedCuisines", selectedCuisines.join(", "));
+            // await new Promise((resolve) => setTimeout(resolve, 1000));
             const response = await axiosInstance.get(`${API_END_POINT}/search/${searchText}?${params.toString()}`);
             set({loading:false, searchedRestaurant: response.data});   
             // if(response.data.success) {
@@ -148,8 +115,10 @@ export const useRestaurantStore = create<RestaurantState>()(persist((set) => ({
             const updatedFilter = isAlreadyApplied ? state.appliedFilter.filter((item) => item != value) : [...state.appliedFilter, value];
             return {appliedFilter:updatedFilter}
         })
+    },
+    resetAppliedFilter: () => {
+        set({appliedFilter:[]});
     }
-
 
 }), {
     name: "restaurant-name",
