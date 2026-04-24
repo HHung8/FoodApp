@@ -23,8 +23,6 @@ const SearchPage = () => {
     console.log(`checksearchRestaurant`, searchRestaurant)
   }, [params.text!,appliedFilter]);
 
-
-
   return (
     <div className="max-w-7xl mx-auto my-10">
       <div className="flex flex-col md:flex-row justify-between gap-10">

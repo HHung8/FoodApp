@@ -163,6 +163,7 @@ export const useUserStore = create<UserState>()(
           set({ loading: false });
         }
       },
+      
       updateProfile: async (input: any) => {
             try {
                 const response = await axiosInstance.put(
@@ -183,7 +184,7 @@ export const useUserStore = create<UserState>()(
             } catch (error: any) {
                 toast.error(error.response.data.message);
             }
-        },
+      },
     }),
     {
       name: "user-name",

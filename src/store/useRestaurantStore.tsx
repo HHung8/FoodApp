@@ -118,6 +118,18 @@ export const useRestaurantStore = create<RestaurantState>()(persist((set) => ({
     },
     resetAppliedFilter: () => {
         set({appliedFilter:[]});
+    },
+    getSingleRestaurant: async (restaurantId:string) => {
+        try {
+            const response = await axios.get(`${API_END_POINT}/${restaurantId}`);
+            console.log(`check response restaurant detail123`, response.data.restaurant);
+            if(response.data.success) {
+                set({singleRestaurant: response.data.restaurant});
+            }
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
     }
 
 }), {

@@ -1,10 +1,19 @@
 import { Timer } from 'lucide-react';
-import React from 'react'
-import { useParams } from 'react-router-dom'
-import { Badge } from './ui/badge';
+import { useParams } from 'react-router-dom';
 import AvailableMenu from './AvailableMenu';
+import { useRestaurantStore } from '../store/useRestaurantStore';
+import { useEffect } from 'react';
 
 const RestaurantDetail = () => {
+  const params = useParams();
+  const {singleRestaurant, getSingleRestaurant} = useRestaurantStore();
+
+  useEffect(() => {
+    if (params.id) {
+      getSingleRestaurant(params.id);
+      console.log(singleRestaurant);
+    }
+  }, [params.id])
 
   return (
    <div className="max-w-6xl mx-auto my-10">

@@ -8,6 +8,7 @@ import { useUserStore } from "../store/useUserStore";
 
 const Profile = () => {
   const {user, updateProfile} = useUserStore();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [profileData, setProfileData] = useState({
     fullname: user?.fullname || "",
     email: user?.email || "",
@@ -18,34 +19,44 @@ const Profile = () => {
   });
   const imageRef = useRef<HTMLInputElement | null>(null);
   const [selectedProfilePicture, setSelectedProfilePicture] = useState<string>( profileData?.profilePicture || "");
-  const loading = false;
+  const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
+ 
 
-  const fileChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+const fileChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setSelectedProfilePicture(result);
-        setProfileData((prevData) => ({
-          ...prevData,
-          profilePicture: result,
-        }));
-      };
-      reader.readAsDataURL(file);
+        setProfilePictureFile(file); // ✅ lưu File object
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setSelectedProfilePicture(reader.result as string); // chỉ dùng để preview
+        };
+        reader.readAsDataURL(file);
     }
-  };
-
+};
   const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setProfileData({ ...profileData, [name]: value });
   };
 
-  const updateProfileHandler = async (e: FormEvent<HTMLFormElement>) => {
+const updateProfileHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // console.log(profileData);
-    await updateProfile(profileData);
-  };
+    try {
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append("fullname", profileData.fullname);
+      formData.append("email", profileData.email);
+      formData.append("address", profileData.address);
+      formData.append("city", profileData.city);
+      formData.append("country", profileData.country);
+      if (profilePictureFile) {
+          formData.append("profilePicture", profilePictureFile); // ✅ gửi File thật
+      }
+      await updateProfile(formData);
+      setIsLoading(false);
+    } catch (error:any) {
+      setIsLoading(false);
+    }
+};
 
   return (
     <form onSubmit={updateProfileHandler} className="max-w-7xl mx-auto my-5">
@@ -129,7 +140,7 @@ const Profile = () => {
         </div>
       </div>
       <div className="text-center">
-        {loading ? (
+        {isLoading ? (
           <Button disabled className="bg-orange hover:bg-hoverOrange">
             <Loader2 className="mr-2 w-4 h-4 animate-spin" /> Please wait
           </Button>
