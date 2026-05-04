@@ -5,13 +5,14 @@ import { HandPlatter, Loader2, Menu, Moon, PackageCheck, ShoppingCart, SquareMen
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
-import { Label } from "@radix-ui/react-menubar";
-import { Input } from "./ui/input";
 import { Separator } from "./ui/separator";
 import { useUserStore } from "../store/useUserStore";
+import { useCartStore } from "../store/useCartStore";
 
 const Navbar = () => {
     const {user, loading, logout} = useUserStore();
+    const {cart} = useCartStore();
+    console.log(`check user navbar123`, user);
     return (
         <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between h-14">
@@ -61,15 +62,15 @@ const Navbar = () => {
                     </div>
                     <Link to="/cart" className="relative cursor-pointer">
                         <ShoppingCart />
-                        <Button className="absolute -inset-y-3 left-2 text-xs rounded-full h-4 w-4 bg-red-500">5</Button>
+                        {
+                            cart.length > 0 && (
+                                <Button className="absolute -inset-y-3 left-2 text-xs rounded-full h-4 w-4 bg-red-500">{cart.length}</Button>
+                            )
+                        }
                     </Link>
                     <div>
                        <Avatar>
-                            <AvatarImage
-                                src="https://github.com/shadcn.png"
-                                alt="@shadcn"
-                                className="grayscale"
-                            />
+                            <AvatarImage src={user?.profilePicture} alt="profilephoto" />
                             <AvatarFallback>CN</AvatarFallback>
                        </Avatar>
                     </div>

@@ -1,29 +1,24 @@
 import { Minus, Plus } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "./ui/table";
+import {Table,TableBody,TableCell,TableFooter,TableHead,TableHeader,TableRow,} from "./ui/table";
 import { useState } from "react";
 import CheckoutConfirmPage from "./CheckoutConfirmPage";
+import { useCartStore } from "../store/useCartStore";
 // import CheckoutConfirmPage from "./CheckoutConfirmPage";
 // import { useCartStore } from "@/store/useCartStore";
 // import { CartItem } from "@/types/cartType";
 
 const Cart = () => {
+  const API_END_POINT = "http://localhost:5246"
   const [open, setOpen] = useState<boolean>(false);
-  const cart = ["Test1234", "Test456"]
-//   const { cart, decrementQuantity, incrementQuantity } = useCartStore();
+  const { cart, decrementQuantity, incrementQuantity } = useCartStore();
 
-//   let totalAmount = cart.reduce((acc, ele) => {
-//     return acc + ele.price * ele.quantity;
-//   }, 0);
+  console.log(`check cart 123`, cart);
+  let totalAmount = cart.reduce((acc, ele) => {
+    return acc + ele.price * ele.quantity;
+  }, 0);
+
   return (
     <div className="flex flex-col max-w-7xl mx-auto my-10">
       <div className="flex justify-end">
@@ -41,11 +36,11 @@ const Cart = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {cart.map((item: CartItem) => (
+          {cart.map((item:CartItem) => (
             <TableRow>
               <TableCell>
                 <Avatar>
-                  <AvatarImage src={item.image} alt="" />
+                  <AvatarImage src={`${API_END_POINT}${item.image}`} alt="" />
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
               </TableCell>
@@ -54,7 +49,7 @@ const Cart = () => {
               <TableCell>
                 <div className="w-fit flex items-center rounded-full border border-gray-100 dark:border-gray-800 shadow-md">
                   <Button
-                //   onClick={() => decrementQuantity(item._id)}
+                    onClick={() => decrementQuantity(item.id)}
                     size={"icon"}
                     variant={"outline"}
                     className="rounded-full bg-gray-200"
@@ -70,7 +65,7 @@ const Cart = () => {
                     {item.quantity}
                   </Button>
                   <Button
-                //   onClick={() => incrementQuantity(item._id)}
+                    onClick={() => incrementQuantity(item.id)}
                     size={"icon"}
                     className="rounded-full bg-orange hover:bg-hoverOrange"
                     variant={"outline"}
@@ -91,7 +86,7 @@ const Cart = () => {
         <TableFooter>
           <TableRow className="text-2xl font-bold">
             <TableCell colSpan={5}>Total</TableCell>
-            <TableCell className="text-right">123</TableCell>
+            <TableCell className="text-right">{totalAmount}</TableCell>
           </TableRow>
         </TableFooter>
       </Table>

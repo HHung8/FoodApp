@@ -4,8 +4,10 @@ import {create} from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import axiosInstance from "../lib/axiosInstance";
 import type { RestaurantState } from "../types/restaurantType";
+import { parseCuisines } from "../lib/paserJson";
 
 const API_END_POINT = "http://localhost:5246/api/restaurant";
+
 
 export const useRestaurantStore = create<RestaurantState>()(persist((set) => ({
     loading: false,
@@ -121,10 +123,20 @@ export const useRestaurantStore = create<RestaurantState>()(persist((set) => ({
     },
     getSingleRestaurant: async (restaurantId:string) => {
         try {
-            const response = await axios.get(`${API_END_POINT}/${restaurantId}`);
+            const response = await axiosInstance.get(`${API_END_POINT}/${restaurantId}`);
             console.log(`check response restaurant detail123`, response.data.restaurant);
+            
             if(response.data.success) {
-                set({singleRestaurant: response.data.restaurant});
+                const data = response.data.restaurant;
+                console.log("raw cuisines:", data?.cuisines);
+                console.log("parsed cuisines:", parseCuisines(data?.cuisines));
+      
+                set({
+                    singleRestaurant: {
+                        ...data,
+                        cuisines: parseCuisines(data?.cuisines)
+                    }
+                })
             }
         } catch (error) {
             console.log(error);

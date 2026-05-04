@@ -139,7 +139,7 @@ const updateProfileHandler = async (e: React.FormEvent<HTMLFormElement>) => {
           </div>
         </div>
       </div>
-      <div className="text-center">
+      <div className="text-center"> 
         {isLoading ? (
           <Button disabled className="bg-orange hover:bg-hoverOrange">
             <Loader2 className="mr-2 w-4 h-4 animate-spin" /> Please wait
