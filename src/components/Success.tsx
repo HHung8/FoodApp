@@ -1,52 +1,30 @@
- 
-import { IndianRupee } from "lucide-react";
+ import { IndianRupee } from "lucide-react";
 import { Separator } from "./ui/separator";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
-// import { useOrderStore } from "@/store/useOrderStore";
-import { useEffect } from "react"; 
-// import { CartItem } from "@/types/cartType";
+import { useEffect, useRef } from "react"; 
+import { useOrderStore } from "../store/useOrderStore";
 
 const Success = () => {
-const orders = [
-  {
-    cartItems: [
-      {
-        name: "Butter Chicken",
-        image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=400",
-        price: 250,
-      },
-      {
-        name: "Garlic Naan",
-        image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400",
-        price: 50,
-      },
-    ],
-  },
-  {
-    cartItems: [
-      {
-        name: "Paneer Tikka",
-        image: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=400",
-        price: 200,
-      },
-    ],
-  },
-];
-//   const { orders, getOrderDetails } = useOrderStore();
 
-//   useEffect(() => {
-//     getOrderDetails();
-//   }, []);
+  const {orders, getOrderDetails} = useOrderStore();
+  console.log(`check order`, orders)
+  const hasFetched = useRef(false);
 
-//   if (orders.length === 0)
-//     return (
-//       <div className="flex items-center justify-center min-h-screen">
-//         <h1 className="font-bold text-2xl text-gray-700 dark:text-gray-300">
-//           Order not found!
-//         </h1>
-//       </div>
-//     );
+  useEffect(() => {
+      if(hasFetched.current) return;  
+      hasFetched.current = true;
+      getOrderDetails()
+  }, []);
+
+  if(orders.length === 0) 
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+          <h1 className="font-bold text-2xl text-gray-700 dark:text-gray-300">
+              Order not found
+          </h1>
+      </div>
+    )
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 px-4">
@@ -62,31 +40,27 @@ const orders = [
             Order Summary
           </h2>
           {/* Your Ordered Item Display here  */}
-          {orders?.map((order:any, index:number) => (
-            <div key={index}>
-              {order.cartItems.map((item:CartItem) => (
-                <div className="mb-4">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center">
-                      <img
-                        src={item.image}
-                        alt=""
-                        className="w-14 h-14 rounded-md object-cover"
-                      />
-                      <h3 className="ml-4 text-gray-800 dark:text-gray-200 font-medium">
-                        {item.name}
-                      </h3>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-gray-800 dark:text-gray-200 flex items-center">
-                        <IndianRupee />
-                        <span className="text-lg font-medium">{item.price}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <Separator className="my-4" />
+         {orders[0]?.cartItems?.map((item: any, i: number) => (
+            <div key={i} className="mb-4">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center">
+                  <img
+                    src={item.image}
+                    alt=""
+                    className="w-14 h-14 rounded-md object-cover"
+                  />
+                  <h3 className="ml-4 text-gray-800 dark:text-gray-200 font-medium">
+                    {item.name}
+                  </h3>
                 </div>
-              ))}
+                <div className="text-right">
+                  <div className="text-gray-800 dark:text-gray-200 flex items-center">
+                    <IndianRupee />
+                    <span className="text-lg font-medium">{item.price}</span>
+                  </div>
+                </div>
+              </div>
+              <Separator className="my-4" />
             </div>
           ))}
         </div>

@@ -46,7 +46,7 @@ const CheckoutConfirmPage = ({
     // console.log(input);
     try {
       const checkoutData: CheckoutSessionRequest = {
-        cartItem: cart.map((cartItem) => ({
+        cartItem: cart.map((cartItem: any) => ({
           menuId: cartItem.id,
           name: cartItem.name,
           image: cartItem.image,

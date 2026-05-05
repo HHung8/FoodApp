@@ -1,3 +1,4 @@
+import { Orders } from './orderType';
 export type CheckoutSessionRequest = {
     cartItem:{
         menuId:string;
@@ -17,10 +18,26 @@ export type CheckoutSessionRequest = {
     restaurantId:string
 };
 
-export interface Orders extends CheckoutSessionRequest {
+export interface Orders {
     id:string;
     status:string;
     totalAmount:number;
+    cartItems: {
+        menuId: string;
+        name: string;
+        image: string;
+        price: number;
+        quantity: number;
+    }[];
+    deliveryDetails: {
+        name: string;
+        email: string;
+        contact: string;
+        address: string;
+        city: string;
+        country: string;
+    };
+    restaurantId: string;
 }
 
 export type OrderState = {

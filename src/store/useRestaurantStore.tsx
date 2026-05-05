@@ -5,6 +5,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import axiosInstance from "../lib/axiosInstance";
 import type { RestaurantState } from "../types/restaurantType";
 import { parseCuisines } from "../lib/paserJson";
+import type { Orders } from "../types/orderType";
 
 const API_END_POINT = "http://localhost:5246/api/restaurant";
 
@@ -141,6 +142,38 @@ export const useRestaurantStore = create<RestaurantState>()(persist((set) => ({
         } catch (error) {
             console.log(error);
             throw error;
+        }
+    },
+    getRestaurantOrders: async () => {
+        try {
+            const response = await axiosInstance.get(`${API_END_POINT}/order`);
+            if(response.data.success) {
+               const orders = response.data.data.map((order: any) => ({
+                ...order,
+                cartItems: JSON.parse(order.cartItems),
+                deliveryDetails: JSON.parse(order.deliveryDetails)
+            }));
+            set({restaurantOrder: orders})    
+        }
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    updateRestaurantOrders: async(orderId:string, status:string) => {
+        try {
+            const response = await axiosInstance.put(`${API_END_POINT}/order/${orderId}/status`, {status}, {
+                headers: {
+                    'Content-Type' : 'application/json'
+                }
+            });
+           if(response.data.success) {
+                set((state) => ({
+                    restaurantOrder: state.restaurantOrder.map((order:any) => order.id === orderId ? {...order, status:response.data.data.status} : order)
+                }));
+                toast.success(response.data.message);
+           }
+        } catch (error: any) {
+            toast.error(message);
         }
     }
 

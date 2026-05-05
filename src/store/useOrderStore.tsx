@@ -18,24 +18,43 @@ export const useOrderStore = create<OrderState>()(persist((set => ({
             const payload = {
                 restaurantId: checkoutSession.restaurantId,
                 deliveryDetails: JSON.stringify(checkoutSession.deliveryDetails),
-                cartItems: JSON.stringify(checkoutSession.cartItem),
+                cartItems: JSON.stringify(checkoutSession.cartItem.map(item => ({
+                    ...item,
+                    price: parseFloat(item.price),
+                    quantity: parseInt(item.quantity)
+                }))),
                 totalAmount: totalAmount
             }
-
             const response = await axiosInstance.post(`${API_END_POINT}/checkout`, 
                 payload,
                 {headers: {'Content-Type':'application/json'}}
             );
-            window.location.href = response.data.session.url;
-            set({loading:false})
-        } catch (error) {
+            console.log(`check response`, response.data);
+            if(response.data?.session?.url) {
+                window.location.href = response.data.session.url;
+            } else {
+                console.error("Không có session URL", response.data);
+            }
+            set({loading:false})    
+        } catch (error: any) {
+            console.error("Checkout error", error.response?.data || error.message);
             set({loading:false})
         }
     },
     getOrderDetails: async () => {
-
+        try {
+            set({loading:true});
+            const response = await axiosInstance.get(`${API_END_POINT}`);
+            const orders = response.data.orders.map((order:any) => ({
+                ...order,
+               cartItems: JSON.parse(order.cartItems),
+               deliveryDetails: JSON.parse(order.deliveryDetails)
+            }))
+            set({loading:false, orders})
+        } catch (error) {
+            set({loading:false})
+        }
     }
-
 })), {
     name:"order-name",
     storage: createJSONStorage(() => localStorage)

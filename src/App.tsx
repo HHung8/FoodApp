@@ -96,7 +96,7 @@ const appRouter = createBrowserRouter([
         element: <AdminRoute> <AddMenu /> </AdminRoute>,
       },
       {
-        path: "/admin/orders",
+        path: "/admin/order",
         element: <AdminRoute> <Order /> </AdminRoute> ,
       },
     ],
