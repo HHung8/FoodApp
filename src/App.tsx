@@ -5,7 +5,6 @@ import Signup from "./auth/Signup";
 import ForgotPassword from "./auth/ForgotPassword";
 import ResetPassword from "./auth/ResetPassword";
 import VerifyEmail from "./auth/VerifyEmail";
-import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
 import MainLayout from "./layout/MainLayout";
 import Profile from "./components/Profile";
@@ -19,6 +18,7 @@ import Success from "./components/Success";
 import { useUserStore } from "./store/useUserStore";
 import { useEffect } from "react";
 import Loading from "./components/Loading";
+import { useThemeStore } from "./store/useThemeStore";
 
 const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, user } = useUserStore();
@@ -124,9 +124,11 @@ const appRouter = createBrowserRouter([
 ]);
 
 function App() {
+  const initializeTheme = useThemeStore((state:any) => state.initializeTheme);
   const { checkAuthentication, isCheckingAuth } = useUserStore();
   useEffect(() => {
     checkAuthentication();
+    initializeTheme();
   }, [checkAuthentication]);
   if (isCheckingAuth) return <Loading />;
   return (

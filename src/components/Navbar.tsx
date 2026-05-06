@@ -8,11 +8,13 @@ import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHe
 import { Separator } from "./ui/separator";
 import { useUserStore } from "../store/useUserStore";
 import { useCartStore } from "../store/useCartStore";
+import { useThemeStore } from "../store/useThemeStore";
 
 const Navbar = () => {
     const {user, loading, logout} = useUserStore();
     const {cart} = useCartStore();
-    console.log(`check user navbar123`, user);
+    const {setTheme} = useThemeStore();
+
     return (
         <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between h-14">
@@ -55,8 +57,8 @@ const Navbar = () => {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem>Light</DropdownMenuItem>
-                                <DropdownMenuItem>Dark</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setTheme("light")}>Light</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setTheme("dark")} >Dark</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -98,7 +100,7 @@ export default Navbar
 
 const MobileNavbar = () => {
     const {user, loading, logout} = useUserStore();
-
+    const {setTheme} = useThemeStore();
     return (
         <Sheet>
         <SheetTrigger asChild>
@@ -118,8 +120,8 @@ const MobileNavbar = () => {
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Light</DropdownMenuItem>
-                        <DropdownMenuItem>Dark</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setTheme('light')}>Light</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setTheme('dark')}>Dark</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </SheetHeader>
