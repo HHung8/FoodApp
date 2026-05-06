@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
 import { useOrderStore } from "../store/useOrderStore";
 
 const Success = () => {
-
+  const API_END_POINT = "http://localhost:5246"
   const {orders, getOrderDetails} = useOrderStore();
   console.log(`check order`, orders)
   const hasFetched = useRef(false);
@@ -45,7 +45,7 @@ const Success = () => {
               <div className="flex justify-between items-center">
                 <div className="flex items-center">
                   <img
-                    src={item.image}
+                    src={`${API_END_POINT}${item.image}`}
                     alt=""
                     className="w-14 h-14 rounded-md object-cover"
                   />
