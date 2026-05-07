@@ -4,7 +4,7 @@ import axios from "axios";
 import type { LoginInputState, SignupInputState } from "../schema/userSchema";
 import { toast } from "sonner";
 import axiosInstance from "../lib/axiosInstance";
-import { file } from "zod";
+import { useCartStore } from "./useCartStore";
 
 const API_END_POINT = "http://localhost:5246/api/user";
 axios.defaults.withCredentials = true;
@@ -120,17 +120,34 @@ export const useUserStore = create<UserState>()(
         } 
       },
 
+      // logout: async () => {
+      //   try {
+      //     set({ loading: true });
+      //     const response = await axios.post(`${API_END_POINT}/logout`);
+      //     if (response.data.success) {
+      //       toast.success(response.data.message);
+      //       set({ loading: false, user: null, isAuthenticated: false });
+      //     }
+      //   } catch (error) {
+      //     set({ loading: false });
+      //   }
+      // },
+
       logout: async () => {
-        try {
-          set({ loading: true });
-          const response = await axios.post(`${API_END_POINT}/logout`);
-          if (response.data.success) {
-            toast.success(response.data.message);
-            set({ loading: false, user: null, isAuthenticated: false });
+          try {
+              set({loading:true});
+              // Delete localStorage
+              localStorage.removeItem("token");
+              localStorage.removeItem("user-name");
+              localStorage.removeItem("order-name");
+              localStorage.removeItem("currentOrder");
+              localStorage.removeItem("restaurant-name");
+              useCartStore.getState().clearCart();
+              set({loading:false, user:null, isAuthenticated:false});
+              toast.success("Logged out successfully");
+          } catch (error:any) {
+              set({loading:false});
           }
-        } catch (error) {
-          set({ loading: false });
-        }
       },
 
       forgotPassword: async (email: string) => {

@@ -1,4 +1,5 @@
 import { Orders } from './orderType';
+
 export type CheckoutSessionRequest = {
     cartItem:{
         menuId:string;
@@ -43,6 +44,8 @@ export interface Orders {
 export type OrderState = {
     loading:boolean;
     orders:Orders[];
+    currentOrder: Orders | null;
+    clearCurrentOrder: () => void;
     createCheckoutSession: (checkoutSessionRequest:CheckoutSessionRequest) => Promise<void>;
     getOrderDetails: () => Promise<void>;
 }

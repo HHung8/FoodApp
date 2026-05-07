@@ -35,32 +35,40 @@ const CheckoutConfirmPage = ({
   });
   const {cart} = useCartStore();
   const {restaurant} = useRestaurantStore();
+  console.log(`check restaurant`, restaurant)
   const {createCheckoutSession, loading} = useOrderStore();
   const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setInput({ ...input, [name]: value });
   };
 
-  const checkoutHandler = async (e: FormEvent<HTMLFormElement>) => {
+ const checkoutHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // console.log(input);
     try {
-      const checkoutData: CheckoutSessionRequest = {
-        cartItem: cart.map((cartItem: any) => ({
-          menuId: cartItem.id,
-          name: cartItem.name,
-          image: cartItem.image,
-          price: cartItem.price.toString(),
-          quantity: cartItem.quantity.toString(),
-        })),
-        deliveryDetails: input,
-        restaurantId: restaurant?.id as string
-      };
-      await createCheckoutSession(checkoutData);
+        // ✅ Lấy restaurantId từ cart item đầu tiên
+        const restaurantId = cart[0]?.restaurantId;
+        
+        if(!restaurantId) {
+            console.error("Restaurant not found in cart");
+            return;
+        }
+
+        const checkoutData: CheckoutSessionRequest = {
+            cartItem: cart.map((cartItem: any) => ({
+                menuId: cartItem.id,
+                name: cartItem.name,
+                image: cartItem.image,
+                price: cartItem.price.toString(),
+                quantity: cartItem.quantity.toString(),
+            })),
+            deliveryDetails: input,
+            restaurantId: restaurantId // ✅ lấy từ cart
+        };
+        await createCheckoutSession(checkoutData);
     } catch (error) {
-      console.log(error);
+        console.log(error);
     }
-  };
+};
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

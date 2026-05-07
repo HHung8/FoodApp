@@ -1,4 +1,4 @@
- import { IndianRupee } from "lucide-react";
+import { IndianRupee } from "lucide-react";
 import { Separator } from "./ui/separator";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
@@ -7,17 +7,21 @@ import { useOrderStore } from "../store/useOrderStore";
 
 const Success = () => {
   const API_END_POINT = "http://localhost:5246"
-  const {orders, getOrderDetails} = useOrderStore();
-  console.log(`check order`, orders)
+  const {orders, getOrderDetails, currentOrder, clearCurrentOrder} = useOrderStore();
+  console.log(`check current orders`, currentOrder);
   const hasFetched = useRef(false);
 
   useEffect(() => {
       if(hasFetched.current) return;  
       hasFetched.current = true;
-      getOrderDetails()
+      getOrderDetails();
   }, []);
 
-  if(orders.length === 0) 
+  // read localStorage 
+  const savedOrder = localStorage.getItem("currentOrder");
+  const latestOrder = currentOrder || (savedOrder ? JSON.parse(savedOrder) : null);
+
+  if(!latestOrder) 
     return (
       <div className="flex items-center justify-center min-h-screen">
           <h1 className="font-bold text-2xl text-gray-700 dark:text-gray-300">
@@ -40,7 +44,7 @@ const Success = () => {
             Order Summary
           </h2>
           {/* Your Ordered Item Display here  */}
-         {orders[0]?.cartItems?.map((item: any, i: number) => (
+         {latestOrder.cartItems?.map((item: any, i: number) => (
             <div key={i} className="mb-4">
               <div className="flex justify-between items-center">
                 <div className="flex items-center">
@@ -65,7 +69,12 @@ const Success = () => {
           ))}
         </div>
         <Link to="/cart">
-          <Button className="bg-orange hover:bg-hoverOrange w-full py-3 rounded-md shadow-lg">
+          <Button 
+            onClick={() => {
+              localStorage.removeItem("currentOrder");
+              clearCurrentOrder();
+            }}
+            className="bg-orange hover:bg-hoverOrange w-full py-3 rounded-md shadow-lg">
             Continue Shopping
           </Button>
         </Link>

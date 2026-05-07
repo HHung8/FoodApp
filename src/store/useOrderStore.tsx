@@ -8,6 +8,8 @@ const API_END_POINT:string = "http://localhost:5246/api/order"
 export const useOrderStore = create<OrderState>()(persist((set => ({
     loading:false,
     orders:[],
+    currentOrder: null,
+
     createCheckoutSession: async (checkoutSession:CheckoutSessionRequest) => {
         try {
             set({loading:true});
@@ -25,15 +27,28 @@ export const useOrderStore = create<OrderState>()(persist((set => ({
                 }))),
                 totalAmount: totalAmount
             }
+            console.log("checkpaylad", payload)
             const response = await axiosInstance.post(`${API_END_POINT}/checkout`, 
                 payload,
                 {headers: {'Content-Type':'application/json'}}
             );
             console.log(`check response`, response.data);
             if(response.data?.session?.url) {
+                const orderData = {
+                    id: "",
+                    restaurantId: checkoutSession.restaurantId,
+                    cartItems: checkoutSession.cartItem.map(item => ({
+                        ...item,
+                        price: parseFloat(item.price),
+                        quantity: parseInt(item.quantity)
+                    })),
+                    deliveryDetails: checkoutSession.deliveryDetails,
+                    totalAmount: totalAmount,
+                    status: "pending"
+                };
+                
+                localStorage.setItem("currentOrder", JSON.stringify(orderData));
                 window.location.href = response.data.session.url;
-            } else {
-                console.error("Không có session URL", response.data);
             }
             set({loading:false})    
         } catch (error: any) {
@@ -54,8 +69,10 @@ export const useOrderStore = create<OrderState>()(persist((set => ({
         } catch (error) {
             set({loading:false})
         }
-    }
-})), {
+    },
+    clearCurrentOrder: () => set({ currentOrder: null }),
+
+    })), {
     name:"order-name",
     storage: createJSONStorage(() => localStorage)
 }))

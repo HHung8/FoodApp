@@ -5,25 +5,34 @@ import type { MenuItem } from "../types/restaurantType";
 
 export const useCartStore = create<any>()(persist((set) => ({
     cart:[],
-    addToCart: (item:MenuItem) => {
+    addToCart: (item: MenuItem, restaurantId: string) => { // ✅ thêm restaurantId
         set((state) => {
-          const existingItem = state.cart.find((cartItem) => cartItem.id === item.id);
-          if(existingItem) {
-            // already added in cart inc qty
-            return {
-                cart: state.cart.map((cartItem) => cartItem.id === item.id ? {...cartItem, quantity:cartItem.quantity + 1} : cartItem)
-            };
-          } else {
-            return {cart: [...state.cart, {...item, quantity: 1}]}
-          }
-        })
+            const existingItem = state.cart.find((cartItem) => cartItem.id === item.id);
+            if(existingItem) {
+                return {
+                    cart: state.cart.map((cartItem) =>
+                        cartItem.id === item.id
+                            ? {...cartItem, quantity: cartItem.quantity + 1}
+                            : cartItem
+                    )
+                };
+            } else {
+                return {
+                    cart: [...state.cart, {
+                        ...item,
+                        quantity: 1,
+                        restaurantId // ✅ lưu vào cart item
+                    }]
+                };
+            }
+        });
     },
     clearCart: () => {
         set({cart:[]});
     },
     removeFromTheCart: (id:string) => {
         set((state) => ({
-            cart:state.cart.filter((item) => item._id != id)
+            cart:state.cart.filter((item) => item.id != id)
         }))
     },
     incrementQuantity: (id:string) => {
@@ -38,6 +47,6 @@ export const useCartStore = create<any>()(persist((set) => ({
     }
 }), 
 {
-    name:'user-name',
+    name:'cart-name',
     storage: createJSONStorage(() => localStorage)
 }))
