@@ -8,6 +8,7 @@ const API_END_POINT:string = "http://localhost:5246/api/order"
 export const useOrderStore = create<OrderState>()(persist((set => ({
     loading:false,
     orders:[],
+    error: null,
     currentOrder: null,
 
     createCheckoutSession: async (checkoutSession:CheckoutSessionRequest) => {
@@ -58,13 +59,15 @@ export const useOrderStore = create<OrderState>()(persist((set => ({
     },
     getOrderDetails: async () => {
         try {
-            set({loading:true});
+            set({loading: true, error: null});
             const response = await axiosInstance.get(`${API_END_POINT}`);
+            console.log(`check response orders 123`, response);
             const orders = response.data.orders.map((order:any) => ({
                 ...order,
                cartItems: JSON.parse(order.cartItems),
                deliveryDetails: JSON.parse(order.deliveryDetails)
-            }))
+            }));
+            console.log(`check orders1234`, orders);
             set({loading:false, orders})
         } catch (error) {
             set({loading:false})

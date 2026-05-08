@@ -15,12 +15,12 @@ const Success = () => {
       if(hasFetched.current) return;  
       hasFetched.current = true;
       getOrderDetails();
-  }, []);
+  }, []); 
 
   // read localStorage 
   const savedOrder = localStorage.getItem("currentOrder");
   const latestOrder = currentOrder || (savedOrder ? JSON.parse(savedOrder) : null);
-
+  console.log(`check lastestOrder`,latestOrder)
   if(!latestOrder) 
     return (
       <div className="flex items-center justify-center min-h-screen">
