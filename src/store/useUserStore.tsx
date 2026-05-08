@@ -6,7 +6,8 @@ import { toast } from "sonner";
 import axiosInstance from "../lib/axiosInstance";
 import { useCartStore } from "./useCartStore";
 
-const API_END_POINT = "http://localhost:5246/api/user";
+// const API_END_POINT = "http://localhost:5246";
+const API_END_POINT = "/api/user";
 axios.defaults.withCredentials = true;
 
 type User = {
@@ -109,17 +110,18 @@ export const useUserStore = create<UserState>()(
 
       checkAuthentication: async () => {
         try {
-          set({ isCheckingAuth: true });
-          const response = await axiosInstance.get(`${API_END_POINT}/check-auth`);
-          console.log(`check response CheckingAuth`, response);
-          if (response.data.success) {
-            set({user: response.data.data, isAuthenticated: true, isCheckingAuth: false });
-          }
+            set({ isCheckingAuth: true });
+            const response = await axiosInstance.get(`${API_END_POINT}/check-auth`);
+            if (response.data.success) {
+                set({ user: response.data.data, isAuthenticated: true, isCheckingAuth: false });
+            } else {
+                // ✅ Thêm dòng này — trường hợp BE trả về success: false
+                set({ isAuthenticated: false, isCheckingAuth: false });
+            }
         } catch (error) {
-          set({ isAuthenticated: false, isCheckingAuth: false });
-        } 
+            set({ isAuthenticated: false, isCheckingAuth: false });
+        }
       },
-
       // logout: async () => {
       //   try {
       //     set({ loading: true });

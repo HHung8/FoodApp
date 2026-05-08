@@ -4,7 +4,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import axiosInstance from "../lib/axiosInstance";
 import { useRestaurantStore } from "./useRestaurantStore";
 
-const API_END_POINT = "http://localhost:5246/api/menu";
+const API_END_POINT = "http://localhost:5246http://localhost:5246/menu";
 
 type MenuState = {
     loading:boolean;

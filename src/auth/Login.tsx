@@ -41,22 +41,14 @@ const Login = () => {
       Partial<LoginInputState>
     >({});
 
-  const { login } =
-    useUserStore();
-
-  const navigate =
-    useNavigate();
+  const { login } = useUserStore();
+  const navigate = useNavigate();
 
   const changeEventHandler = (
     e: ChangeEvent<HTMLInputElement>
   ) => {
-    const { name, value } =
-      e.target;
-
-    setInput({
-      ...input,
-      [name]: value,
-    });
+    const { name, value } = e.target;
+    setInput({...input, [name]: value,});
   };
 
   const loginSubmitHandler =

@@ -7,7 +7,7 @@ import type { RestaurantState } from "../types/restaurantType";
 import { parseCuisines } from "../lib/paserJson";
 import type { Orders } from "../types/orderType";
 
-const API_END_POINT = "http://localhost:5246/api/restaurant";
+const API_END_POINT = "http://localhost:5246http://localhost:5246/restaurant";
 
 
 export const useRestaurantStore = create<RestaurantState>()(persist((set) => ({

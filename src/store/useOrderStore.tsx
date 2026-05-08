@@ -3,7 +3,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import type { CheckoutSessionRequest, OrderState } from "../types/orderType";
 import axiosInstance from "../lib/axiosInstance";
 
-const API_END_POINT:string = "http://localhost:5246/api/order"
+const API_END_POINT:string = "http://localhost:5246http://localhost:5246/order"
 
 export const useOrderStore = create<OrderState>()(persist((set => ({
     loading:false,
