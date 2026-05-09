@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-    withCredentials:true,
+    baseURL: "/api",  
+    withCredentials: true,
 });
 
 axiosInstance.interceptors.request.use((config) => {

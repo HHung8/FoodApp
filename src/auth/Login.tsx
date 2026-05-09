@@ -1,49 +1,16 @@
-import {
-  Loader2,
-  LockKeyhole,
-  Mail,
-  UtensilsCrossed,
-} from "lucide-react";
-
+import {Loader2,LockKeyhole,Mail,UtensilsCrossed,} from "lucide-react";
 import { Input } from "../components/ui/input";
-
 import { Button } from "../components/ui/button";
-
 import { Separator } from "../components/ui/separator";
-
-import {
-  Link,
-  useNavigate,
-} from "react-router-dom";
-
-import {
-  useState,
-  type ChangeEvent,
-  type FormEvent,
-} from "react";
-
-import {
-  userLoginSchema,
-  type LoginInputState,
-} from "../schema/userSchema";
-
+import {Link,useNavigate}from "react-router-dom";
+import {useState,type ChangeEvent,type FormEvent,} from "react";
+import {userLoginSchema,type LoginInputState} from "../schema/userSchema";
 import { useUserStore } from "../store/useUserStore";
-
 const Login = () => {
-  const [input, setInput] =
-    useState<LoginInputState>({
-      email: "",
-      password: "",
-    });
-
-  const [errors, setErrors] =
-    useState<
-      Partial<LoginInputState>
-    >({});
-
+  const [input, setInput] = useState<LoginInputState>({email: "",password: "",});
+  const [errors, setErrors] = useState<Partial<LoginInputState>>({});
   const { login } = useUserStore();
   const navigate = useNavigate();
-
   const changeEventHandler = (
     e: ChangeEvent<HTMLInputElement>
   ) => {
@@ -54,63 +21,36 @@ const Login = () => {
   const loginSubmitHandler =
     async (e: FormEvent) => {
       e.preventDefault();
-
-      const result =
-        userLoginSchema.safeParse(
-          input
-        );
-
+      const result = userLoginSchema.safeParse(input);
       if (!result.success) {
-        const fieldErrors =
-          result.error.flatten()
-            .fieldErrors;
-
-        setErrors(
-          fieldErrors as Partial<LoginInputState>
-        );
-
+        const fieldErrors = result.error.flatten().fieldErrors;
+        setErrors(fieldErrors as Partial<LoginInputState>);
         return;
       }
-
       try {
         await login(input);
-
         navigate("/");
       } catch (error) {
         console.log(error);
       }
     };
-
   const loading = false;
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-white to-orange-100 px-4 py-10 overflow-hidden">
-      
       {/* Background Blur */}
       <div className="absolute top-0 left-0 w-72 h-72 bg-orange/20 rounded-full blur-3xl" />
-
       <div className="absolute bottom-0 right-0 w-72 h-72 bg-orange/10 rounded-full blur-3xl" />
-
       {/* Card */}
       <div className="relative w-full max-w-5xl bg-white/80 backdrop-blur-xl border border-white/40 shadow-2xl rounded-[40px] overflow-hidden grid lg:grid-cols-2">
-        
         {/* LEFT SIDE */}
         <div className="hidden lg:flex flex-col justify-center bg-gradient-to-br from-orange to-orange/80 text-white p-14 relative overflow-hidden">
-          
           <div className="absolute -top-20 -right-20 w-60 h-60 bg-white/10 rounded-full" />
-
-          <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-white/10 rounded-full" />
-
+          <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-white/10 rounded-full" />\
           <div className="relative z-10">
             <div className="w-20 h-20 rounded-3xl bg-white/20 backdrop-blur-md flex items-center justify-center mb-8 shadow-lg">
               <UtensilsCrossed className="w-10 h-10" />
             </div>
-
-            <h1 className="text-5xl font-extrabold leading-tight">
-              Welcome
-              <br />
-              Back 👋
-            </h1>
+            <h1 className="text-5xl font-extrabold leading-tight">Welcome<br />Back 👋</h1>
 
             <p className="mt-6 text-lg text-orange-50 leading-relaxed">
               Login to continue ordering your favorite meals with fast delivery and premium experience.

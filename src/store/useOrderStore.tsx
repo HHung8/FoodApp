@@ -2,8 +2,8 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import type { CheckoutSessionRequest, OrderState } from "../types/orderType";
 import axiosInstance from "../lib/axiosInstance";
+import { ORDER_API } from "../lib/apiEndpoints";
 
-const API_END_POINT:string = "http://localhost:5246http://localhost:5246/order"
 
 export const useOrderStore = create<OrderState>()(persist((set => ({
     loading:false,
@@ -29,11 +29,10 @@ export const useOrderStore = create<OrderState>()(persist((set => ({
                 totalAmount: totalAmount
             }
             console.log("checkpaylad", payload)
-            const response = await axiosInstance.post(`${API_END_POINT}/checkout`, 
+            const response = await axiosInstance.post(ORDER_API.CHECKOUT, 
                 payload,
                 {headers: {'Content-Type':'application/json'}}
             );
-            console.log(`check response`, response.data);
             if(response.data?.session?.url) {
                 const orderData = {
                     id: "",
@@ -57,24 +56,22 @@ export const useOrderStore = create<OrderState>()(persist((set => ({
             set({loading:false})
         }
     },
+
     getOrderDetails: async () => {
         try {
             set({loading: true, error: null});
-            const response = await axiosInstance.get(`${API_END_POINT}`);
-            console.log(`check response orders 123`, response);
+            const response = await axiosInstance.get(ORDER_API.GET);
             const orders = response.data.orders.map((order:any) => ({
                 ...order,
                cartItems: JSON.parse(order.cartItems),
                deliveryDetails: JSON.parse(order.deliveryDetails)
             }));
-            console.log(`check orders1234`, orders);
             set({loading:false, orders})
         } catch (error) {
             set({loading:false})
         }
     },
     clearCurrentOrder: () => set({ currentOrder: null }),
-
     })), {
     name:"order-name",
     storage: createJSONStorage(() => localStorage)

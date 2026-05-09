@@ -5,10 +5,7 @@ import type { LoginInputState, SignupInputState } from "../schema/userSchema";
 import { toast } from "sonner";
 import axiosInstance from "../lib/axiosInstance";
 import { useCartStore } from "./useCartStore";
-
-// const API_END_POINT = "http://localhost:5246";
-const API_END_POINT = "/api/user";
-axios.defaults.withCredentials = true;
+import { USER_API } from "../lib/apiEndpoints";
 
 type User = {
   fullname: string;
@@ -48,17 +45,15 @@ export const useUserStore = create<UserState>()(
       signup: async (input: SignupInputState) => {
         try {
           set({ loading: true });
-          const response = await axios.post(`${API_END_POINT}/signup`, input, {
-            headers: {
-              "Content-Type": "application/json",
-            },
+          const response = await axiosInstance.post(USER_API.SIGNUP, input, {
+            headers: {"Content-Type": "application/json"},
           });
           if (response.data.success) {
             toast.success(response.data.message);
-            set({loading: false,user: response.data.user,isAuthenticated: true });
+            set({loading: false, user: response.data.user, isAuthenticated: true });
           }
         } catch (error: any) {
-          toast.error(error.response.data.message);
+          toast.error(error.response?.data?.message || "Signup failed");
           set({ loading: false });
           throw error;
         }
@@ -67,7 +62,7 @@ export const useUserStore = create<UserState>()(
       login: async (input: LoginInputState) => {
         try {
           set({ loading: true });
-          const response = await axios.post(`${API_END_POINT}/login`, input, {
+          const response = await axiosInstance.post(USER_API.LOGIN, input, {
             headers: { "Content-Type": "application/json" },
           });
           if (response.data.success) {
@@ -84,25 +79,17 @@ export const useUserStore = create<UserState>()(
 
       verifyEmail: async (verificationCode: string) => {
         try {
-          const response = await axios.post(
-            `${API_END_POINT}/verify-email`,
+          const response = await axiosInstance.post(
+            USER_API.VERIFY_EMAIL,
             { verificationCode },
-            {
-              headers: {
-                "Content-Type": "application/json",
-              },
-            },
+            { headers: {"Content-Type": "application/json"}},
           );
           if (response.data.success) {
             toast.success(response.data.message);
-            set({
-              loading: false,
-              user: response.data.data,
-              isAuthenticated: true,
-            });
+            set({loading: false,user: response.data.data,isAuthenticated: true});
           }
         } catch (error) {
-          toast.error(error.response.data.message);
+          toast.error(error.response?.data?.message || "Verification failed" );
           set({ loading: false });
           throw error;
         }
@@ -111,7 +98,7 @@ export const useUserStore = create<UserState>()(
       checkAuthentication: async () => {
         try {
             set({ isCheckingAuth: true });
-            const response = await axiosInstance.get(`${API_END_POINT}/check-auth`);
+            const response = await axiosInstance.get(USER_API.CHECK_AUTH);
             if (response.data.success) {
                 set({ user: response.data.data, isAuthenticated: true, isCheckingAuth: false });
             } else {
@@ -122,6 +109,7 @@ export const useUserStore = create<UserState>()(
             set({ isAuthenticated: false, isCheckingAuth: false });
         }
       },
+
       // logout: async () => {
       //   try {
       //     set({ loading: true });
@@ -155,16 +143,13 @@ export const useUserStore = create<UserState>()(
       forgotPassword: async (email: string) => {
         try {
           set({ loading: true });
-          const response = await axios.post(
-            `${API_END_POINT}/forgot-password`,
-            { email },
-          );
+          const response = await axiosInstance.post(USER_API.FORGOT_PASSWORD, {email})
           if (response.data.success) {
             toast.success(response.data.message);
             set({ loading: false });
           }
         } catch (error) {
-          toast.error(error.response.data.message);
+          toast.error(error.response?.data?.message || "Failed to send reset email");
           set({ loading: false });
         }
       },
@@ -172,13 +157,13 @@ export const useUserStore = create<UserState>()(
       resetPassword: async (token: string, newPassword: string) => {
         try {
           set({ loading: true });
-          const response = await axios.post(`${API_END_POINT}/reset-password/${token}`,{ newPassword });
+          const response = await axios.post(USER_API.RESET_PASSWORD(token),{ newPassword });
           if (response.data.success) {
             toast.success(response.data.message);
             set({ loading: false });
           }
         } catch (error) {
-          toast.error(error.response.data.message);
+          toast.error(error.response?.data?.message || "Reset password failed");
           set({ loading: false });
         }
       },
@@ -186,7 +171,7 @@ export const useUserStore = create<UserState>()(
       updateProfile: async (input: any) => {
             try {
                 const response = await axiosInstance.put(
-                    `${API_END_POINT}/profile/update`,
+                    USER_API.UPDATE_PROFILE,
                     input, // FormData
                     { headers: { "Content-Type": "multipart/form-data" } } // ✅ đổi sang multipart
                 );

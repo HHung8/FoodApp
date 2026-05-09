@@ -3,8 +3,7 @@ import {create} from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import axiosInstance from "../lib/axiosInstance";
 import { useRestaurantStore } from "./useRestaurantStore";
-
-const API_END_POINT = "http://localhost:5246http://localhost:5246/menu";
+import { MENU_API } from "../lib/apiEndpoints";
 
 type MenuState = {
     loading:boolean;
@@ -21,7 +20,7 @@ export const useMenuStore = create<MenuState>()(
     createMenu: async (formData: FormData) => {
         try {
             set({loading: true});
-            const response = await axiosInstance.post(`${API_END_POINT}/create`, formData, {
+            const response = await axiosInstance.post(MENU_API.CREATE, formData, {
                 headers: {
                     'Content-Type':'multipart/form-data'
                 },
@@ -41,7 +40,7 @@ export const useMenuStore = create<MenuState>()(
     editMenu: async(menuId: string, formData: FormData) => {
     try {
         set({loading: true});
-        const response = await axiosInstance.put(`${API_END_POINT}/${menuId}`, formData, {
+        const response = await axiosInstance.put(MENU_API.UPDATE(menuId), formData, {
             headers: { "Content-Type": "multipart/form-data" }
         });
         if(response.data.success) {
